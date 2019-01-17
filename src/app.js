@@ -19,6 +19,8 @@ const readBody = function(req, res) {
   });
   req.on('end', () => {
     res.body = content;
+    res.write(content);
+    res.end();
   });
 };
 
