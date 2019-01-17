@@ -1,0 +1,21 @@
+<html>
+  <title>Guest Book</title>
+  <head>
+    <link rel="stylesheet" href="/guestBook.css" />
+    <h1 class="heading"><a href="/"><<</a> Guest Book</h1>
+  </head>
+  <body>
+    <div class="infoSection"><h1>Leave a comment</h1></div>
+    <form action="/guestBook" method="POST">
+    <p>
+      <label for="name">Name: </label>
+      <input type="text" name="Name" id="name" />
+    </p>
+    <p>
+      <label for="commment">Comment: </label>
+      <textarea name="Comment" id="comment" cols="20" rows="3"></textarea>
+    </p>
+    <input type="submit" value="Submit" />
+  </form>
+  </body>
+</html>
