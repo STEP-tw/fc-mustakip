@@ -2,34 +2,34 @@
 <html>
   <title>Flower Catalog</title>
   <head>
-    <h1
-      style="text-align: right;
-    color:orange;
-    border-bottom: 1px solid black;
-    padding-right: 200px;
-    height:60px "
-    >
+    <h1 class = "heading">
       Flower Catalog
     </h1>
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="icon" href="/freshorigins.jpg" />
+    <script src="/script.js"></script>
+
   </head>
   <body>
     <div style="display: flex">
-      <div style="width: 1024px;">
-        <img
-          class="flowerCatalog"
-          src="https://bit.ly/2Cn9dM5"
-          alt="file not found"
-        />
+      <div class = "rightSection">
+      
+        <img 
+        class="flowerCatalog"
+        src="/freshorigins.jpg"
+        alt="file not found"
+      />
       </div>
-      <div style="margin-top: 300px;width:500px">
+      <div class = "leftSection"">
         <ul>
           <li><a href="something">Abeliophyllum</a></li>
           <li><a href="something other thing">Ageratum</a></li>
         </ul>
-        <img
-          style="padding-left: 100px"
-          src="https://bit.ly/2TVXT0H"
+        <img 
+          id="jar"
+          onclick="blinkJar(document)"
+          class = "waterJar"
+          src="/animated-flower-image-0021.gif"
           alt="waterer"
         />
         <div><a href="some thing">Guest Book</a></div>

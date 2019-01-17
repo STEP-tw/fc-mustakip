@@ -1,3 +1,20 @@
 .flowerCatalog{
-  width : 102px;
+  width : 1024px;
+}
+.waterJar {
+  padding-left: 100px;
+}
+.leftSection {
+  margin-top: 300px;
+  width:500px;
+}
+.rightSection {
+  width: 1024px;
+}
+.heading {
+  text-align: right;
+  color:orange;
+  border-bottom: 1px solid black;
+  padding-right: 200px;
+  height:60px "
 }
