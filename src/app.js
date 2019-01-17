@@ -1,10 +1,11 @@
 const fs = require('fs');
-const html = fs.readFileSync('index.html', 'utf8');
 
 const app = (req, res) => {
   if (req.url == '/') {
-    res.write(html);
-    res.end();
+    fs.readFile('index.html', (err, data) => {
+      res.write(data);
+      res.end();
+    });
     return;
   }
   if (req.url != '/favicon.ico') {
