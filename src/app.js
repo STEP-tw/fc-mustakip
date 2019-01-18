@@ -1,73 +1,46 @@
 const fs = require('fs');
+const App = require('./framework');
 
-const renderGuestBook = function(req, res) {
-  fs.readFile('guestBook.html', (err, data) => {
-    res.write(data);
-    res.end();
-  });
-};
-
-// const renderMessageReceived = function(req, res) {
-//   res.write('Written');
-//   res.end();
+// const renderGuestBook = function(req, res) {
+//   fs.readFile('./public/guestBook.html', (err, data) => {
+//     res.write(data);
+//     res.end();
+//   });
 // };
 
-const readBody = function(req, res) {
+const readBody = function(req, res, next) {
   let content = '';
   req.on('data', chunk => {
     content = content + chunk;
   });
   req.on('end', () => {
-    res.body = content;
+    req.body = content;
+    res.write('got the info ');
     res.write(content);
-    res.end();
-  });
-};
-
-const renderHome = function(req, res) {
-  fs.readFile('index.html', (err, data) => {
-    res.write(data);
-    res.end();
+    next();
   });
 };
 
 const renderFile = function(req, res) {
-  fs.readFile('.' + req.url, (err, data) => {
+  let path = `./public${req.url}`;
+  if (req.url == '/') {
+    path = './public/index.html';
+  }
+
+  fs.readFile(path, (err, data) => {
     res.write(data);
     res.end();
   });
 };
 
-class App {
-  constructor() {
-    this.routes = [];
-  }
-
-  handle(req, res) {
-    let remainingRoutes = this.routes.filter(route => {
-      if (route.url == req.url && route.method === req.method) return true;
-      return false;
-    });
-    remainingRoutes[0].handler(req, res);
-  }
-
-  post(url, handler) {
-    this.routes.push({method: 'POST', url, handler});
-  }
-
-  get(url, handler) {
-    this.routes.push({method: 'GET', url, handler});
-  }
-}
-
 let app = new App();
-app.get('/', renderHome);
+app.get('/', renderFile);
 app.get('/indexStyle.css', renderFile);
 app.get('/favicon.ico', renderFile);
 app.get('/images/freshorigins.jpg', renderFile);
 app.get('/images/animated-flower-image-0021.gif', renderFile);
-app.get('/src/script.js', renderFile);
-app.get('/guestBook', renderGuestBook);
+app.get('/script.js', renderFile);
+app.get('/guestBook.html', renderFile);
 app.get('/guestBook.css', renderFile);
 app.post('/guestBook', readBody);
 
