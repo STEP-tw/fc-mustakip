@@ -1,28 +1,59 @@
 const fs = require('fs');
-const App = require('./framework');
+const {App, userComment, Comments} = require('./framework');
+let commentHtml = '';
 
-// const renderGuestBook = function(req, res) {
-//   fs.readFile('./public/guestBook.html', (err, data) => {
-//     res.write(data);
-//     res.end();
-//   });
-// };
+const renderGuestBook = function(req, res) {
+  let args = '';
+  if (req.body) {
+    args = extractArgs(req.body);
+    let {dateAndTime, name, comment} = args;
+    let newComment = new userComment(dateAndTime, name, comment);
+    comments.addComment(newComment);
+  }
 
-const readBody = function(req, res, next) {
+  let path = './public/guestBook.html';
+  fs.readFile(path, (err, data) => {
+    res.write(data);
+    fs.readFile('./data.json', (err, data) => {
+      data = JSON.parse(data);
+      let allComments = JSON.stringify(data.concat(comments.comments));
+
+      res.write(allComments);
+      res.end();
+      // });
+    });
+  });
+};
+
+const getDateAndTime = function() {
+  return new Date().toLocaleString();
+};
+
+const extractArgs = function(userContent) {
+  let args = {};
+  let keyValuePairs = userContent.split('&');
+  keyValuePairs = keyValuePairs.map(pair => pair.split('='));
+  keyValuePairs.forEach(pair => (args[pair[0]] = pair[1]));
+  args.dateAndTime = getDateAndTime();
+  return args;
+};
+
+const readBodyAndUpdate = function(req, res, next) {
   let content = '';
+
   req.on('data', chunk => {
     content = content + chunk;
   });
   req.on('end', () => {
     req.body = content;
-    res.write('got the info ');
-    res.write(content);
+    renderGuestBook(req, res);
     next();
   });
 };
 
 const renderFile = function(req, res) {
   let path = `./public${req.url}`;
+
   if (req.url == '/') {
     path = './public/index.html';
   }
@@ -33,16 +64,19 @@ const renderFile = function(req, res) {
   });
 };
 
+let comments = new Comments();
+
 let app = new App();
 app.get('/', renderFile);
+app.post('./guestBook.html', renderFile);
 app.get('/indexStyle.css', renderFile);
 app.get('/favicon.ico', renderFile);
 app.get('/images/freshorigins.jpg', renderFile);
 app.get('/images/animated-flower-image-0021.gif', renderFile);
 app.get('/script.js', renderFile);
-app.get('/guestBook.html', renderFile);
+app.get('/guestBook.html', renderGuestBook);
 app.get('/guestBook.css', renderFile);
-app.post('/guestBook', readBody);
+app.post('/guestBook.html', readBodyAndUpdate);
 
 // Export a function that can act as a handler
 

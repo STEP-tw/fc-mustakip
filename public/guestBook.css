@@ -7,3 +7,24 @@
 .infoSection {
   margin-top: 50px
 }
+
+.commentsTable {
+  border:1px solid black;
+  font-size: 30px;
+}
+
+.dateTime{
+  text-align: center;
+  border:1px solid black;
+  width: 150px;
+}
+.userName{
+  text-align: center;
+  border:1px solid black;
+  width: 200px;
+}
+.comment{
+  text-align: center;
+  border:1px solid black;
+  width: 400px;
+}

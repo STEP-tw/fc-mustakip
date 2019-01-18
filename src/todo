@@ -1,0 +1,5 @@
+* DONE write one handler for get request
+* DONE store some random data in the file data.json
+* DONE try to render that file added with the html when a get request come
+* write a handler for post
+* add the data, you get, in the file

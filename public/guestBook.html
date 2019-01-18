@@ -5,17 +5,27 @@
     <h1 class="heading"><a href="/"><<</a> Guest Book</h1>
   </head>
   <body>
-    <div class="infoSection"><h1>Leave a comment</h1></div>
-    <form action="/guestBook" method="POST">
-    <p>
-      <label for="name">Name: </label>
-      <input type="text" name="Name" id="name" />
-    </p>
-    <p>
-      <label for="commment">Comment: </label>
-      <textarea name="Comment" id="comment" cols="20" rows="3"></textarea>
-    </p>
-    <input type="submit" value="Submit" />
-  </form>
+    <div class="infoSection">
+      <h1>Leave a comment</h1>
+      <form action="/guestBook.html" method="POST">
+        <p>
+          <label for="name">Name: </label>
+          <input type="text" name="name" id="name" />
+        </p>
+        <p>
+          <label for="comment">Comment: </label>
+          <textarea name="comment" id="comment" cols="20" rows="3"></textarea>
+        </p>
+        <input type="submit" value="Submit" />
+      </form>
+    </div>
+    <table class = "commentsTable">
+      <th>
+        <td class = "dateTime">DateTime</td>
+        <td class = "userName">Name</td>
+        <td class = "comment">Comment</td>
+      </th>
+
+    </table>
   </body>
 </html>

@@ -12,18 +12,20 @@ class App {
   handle(req, res) {
     let matchingRoutes = this.routes.filter(this.isMatching.bind(null, req));
     let remainingRoutes = [...matchingRoutes];
+    console.log(remainingRoutes);
 
     const next = function() {
       let current = remainingRoutes[0];
       if (!current) {
-        res.end();
+        // res.end();
         return;
       }
+
       remainingRoutes = remainingRoutes.slice(1);
       current.handler(req, res, next);
     };
     next();
-    }
+  }
 
   post(url, handler) {
     this.routes.push({method: 'POST', url, handler});
@@ -32,6 +34,29 @@ class App {
   get(url, handler) {
     this.routes.push({method: 'GET', url, handler});
   }
+  use(handler) {
+    this.routes.push({handler});
+  }
+}
+class userComment {
+  constructor(dateTime, comment, author) {
+    this.dateTime = dateTime;
+    this.comment = comment;
+    this.author = author;
+  }
 }
 
-module.exports = App;
+class Comments {
+  constructor() {
+    this.comments = [];
+  }
+  addComment(comment) {
+    this.comments.unshift(comment);
+  }
+}
+
+module.exports = {
+  App,
+  userComment,
+  Comments
+};
