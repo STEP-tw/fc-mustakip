@@ -76,6 +76,10 @@ app.get('/images/animated-flower-image-0021.gif', renderFile);
 app.get('/script.js', renderFile);
 app.get('/guestBook.html', renderGuestBook);
 app.get('/guestBook.css', renderFile);
+app.get('/images/pbase-Abeliophyllum.jpg', renderFile);
+app.get('/AbeliophyllumStyle.css', renderFile);
+app.get('/Abeliophyllum.pdf', renderFile);
+app.get('/Abeliophyllum.html', renderFile);
 app.post('/guestBook.html', readBodyAndUpdate);
 
 // Export a function that can act as a handler
