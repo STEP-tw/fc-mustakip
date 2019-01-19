@@ -11,12 +11,12 @@ const renderGuestBook = function(req, res) {
     comments.addComment(newComment);
   }
 
-  let path = './public/guestBook.html';
+  let path = './public/htmlFiles/guestBook.html';
   fs.readFile(path, (err, data) => {
     res.write(data);
     fs.readFile('./data.json', (err, data) => {
       data = JSON.parse(data);
-      let allComments = JSON.stringify(data.concat(comments.comments));
+      let allComments = JSON.stringify(comments.comments.concat(data));
 
       res.write(allComments);
       res.end();
@@ -55,8 +55,9 @@ const renderFile = function(req, res) {
   let path = `./public${req.url}`;
 
   if (req.url == '/') {
-    path = './public/index.html';
+    path = './public/htmlFiles/index.html';
   }
+  console.log(path);
 
   fs.readFile(path, (err, data) => {
     res.write(data);
@@ -68,19 +69,22 @@ let comments = new Comments();
 
 let app = new App();
 app.get('/', renderFile);
-app.post('./guestBook.html', renderFile);
-app.get('/indexStyle.css', renderFile);
-app.get('/favicon.ico', renderFile);
+app.get('/htmlFiles/Ageratum.html', renderFile);
+app.get('/htmlFiles/guestBook.html', renderGuestBook);
+app.post('/htmlFiles/guestBook.html', readBodyAndUpdate);
+app.get('/htmlFiles/Abeliophyllum.html', renderFile);
+app.get('/cssFiles/guestBook.css', renderFile);
+app.get('/cssFiles/indexStyle.css', renderFile);
+app.get('/cssFiles/ageratumStyle.css', renderFile);
+app.get('/cssFiles/AbeliophyllumStyle.css', renderFile);
+app.get('images/favicon.ico', renderFile);
 app.get('/images/freshorigins.jpg', renderFile);
+app.get('/images/pbase-agerantum.jpg', renderFile);
+app.get('/images/pbase-Abeliophyllum.jpg', renderFile);
 app.get('/images/animated-flower-image-0021.gif', renderFile);
 app.get('/script.js', renderFile);
-app.get('/guestBook.html', renderGuestBook);
-app.get('/guestBook.css', renderFile);
-app.get('/images/pbase-Abeliophyllum.jpg', renderFile);
-app.get('/AbeliophyllumStyle.css', renderFile);
-app.get('/Abeliophyllum.pdf', renderFile);
-app.get('/Abeliophyllum.html', renderFile);
-app.post('/guestBook.html', readBodyAndUpdate);
+app.get('/pdfFiles/ageratum.pdf', renderFile);
+app.get('/pdfFiles/Abeliophyllum.pdf', renderFile);
 
 // Export a function that can act as a handler
 
