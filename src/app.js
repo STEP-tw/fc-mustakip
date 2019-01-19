@@ -34,10 +34,12 @@ const renderGuestBook = function(req, res) {
     fs.readFile('./data.json', (err, data) => {
       data = JSON.parse(data);
       let allComments = data.concat(comments.commentList);
-      let commentHtml = convertToHtml(allComments);
+      fs.writeFile('./data.json', JSON.stringify(allComments), () => {
+        let commentHtml = convertToHtml(allComments);
 
-      res.write(commentHtml);
-      res.end();
+        res.write(commentHtml);
+        res.end();
+      });
     });
   });
 };
@@ -52,7 +54,6 @@ const getDate = function() {
 const extractArgs = function(userContent) {
   let args = {};
   let keyValuePairs = userContent.split('&');
-  console.log(keyValuePairs);
   keyValuePairs = keyValuePairs.map(pair => pair.split('='));
   keyValuePairs.forEach(pair => (args[pair[0]] = pair[1]));
   args.time = getTime();
@@ -97,8 +98,7 @@ app.post('/htmlFiles/guestBook.html', readBodyAndUpdate);
 app.get('/htmlFiles/Abeliophyllum.html', renderFile);
 app.get('/cssFiles/guestBook.css', renderFile);
 app.get('/cssFiles/indexStyle.css', renderFile);
-app.get('/cssFiles/ageratumStyle.css', renderFile);
-app.get('/cssFiles/AbeliophyllumStyle.css', renderFile);
+app.get('/cssFiles/pageStyle.css', renderFile);
 app.get('images/favicon.ico', renderFile);
 app.get('/images/freshorigins.jpg', renderFile);
 app.get('/images/pbase-agerantum.jpg', renderFile);
