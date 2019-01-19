@@ -1,5 +1,5 @@
 const fs = require('fs');
-const {App, userComment, Comments} = require('./framework');
+const {App, Comments} = require('./framework');
 
 const convertToHtml = function(commentList) {
   let htmlText = '</table>';
@@ -18,28 +18,28 @@ const convertToHtml = function(commentList) {
   });
   return htmlText;
 };
+
 const renderGuestBook = function(req, res) {
-  let args = '';
   if (req.body) {
-    args = extractArgs(req.body);
-    let {date, time, author, comment} = args;
-
-    let newComment = new userComment(date, time, author, comment);
-    comments.addComment(newComment);
+    let comment = extractComment(req.body);
+    comments.addComment(comment);
   }
+  let path = './public/html/guestBook.html';
+  fs.readFile(path, (err, content) => {
+    res.write(content);
+    renderComments(req, res);
+  });
+};
 
-  let path = './public/htmlFiles/guestBook.html';
-  fs.readFile(path, (err, data) => {
-    res.write(data);
-    fs.readFile('./data.json', (err, data) => {
-      data = JSON.parse(data);
-      let allComments = data.concat(comments.commentList);
-      fs.writeFile('./data.json', JSON.stringify(allComments), () => {
-        let commentHtml = convertToHtml(allComments);
+const renderComments = function(req, res) {
+  fs.readFile('./data.json', (err, jsonContent) => {
+    let parsedContent = JSON.parse(jsonContent);
+    let allComments = parsedContent.concat(comments.commentList);
+    fs.writeFile('./data.json', JSON.stringify(allComments), () => {
+      let commentHtml = convertToHtml(allComments);
 
-        res.write(commentHtml);
-        res.end();
-      });
+      res.write(commentHtml);
+      res.end();
     });
   });
 };
@@ -50,18 +50,22 @@ const getTime = function() {
 const getDate = function() {
   return new Date().toLocaleDateString();
 };
-
-const extractArgs = function(userContent) {
-  let args = {};
-  let keyValuePairs = userContent.split('&');
-  keyValuePairs = keyValuePairs.map(pair => pair.split('='));
-  keyValuePairs.forEach(pair => (args[pair[0]] = pair[1]));
-  args.time = getTime();
-  args.date = getDate();
-  return args;
+const getAuthorAndComment = function(userContent) {
+  let comment = {};
+  let args = userContent.split('&');
+  let keyValuePairs = args.map(pair => pair.split('='));
+  keyValuePairs.forEach(pair => (comment[pair[0]] = pair[1]));
+  return comment;
 };
 
-const readBodyAndUpdate = function(req, res, next) {
+const extractComment = function(userContent) {
+  let comment = getAuthorAndComment(userContent);
+  comment.time = getTime();
+  comment.date = getDate();
+  return comment;
+};
+
+const readBodyAndUpdate = function(req, res) {
   let content = '';
 
   req.on('data', chunk => {
@@ -70,7 +74,6 @@ const readBodyAndUpdate = function(req, res, next) {
   req.on('end', () => {
     req.body = content;
     renderGuestBook(req, res);
-    next();
   });
 };
 
@@ -78,7 +81,7 @@ const renderFile = function(req, res) {
   let path = `./public${req.url}`;
 
   if (req.url == '/') {
-    path = './public/htmlFiles/index.html';
+    path = './public/html/index.html';
   }
   console.log(path);
 
@@ -91,23 +94,8 @@ const renderFile = function(req, res) {
 let comments = new Comments();
 
 let app = new App();
-app.get('/', renderFile);
-app.get('/htmlFiles/Ageratum.html', renderFile);
-app.get('/htmlFiles/guestBook.html', renderGuestBook);
-app.post('/htmlFiles/guestBook.html', readBodyAndUpdate);
-app.get('/htmlFiles/Abeliophyllum.html', renderFile);
-app.get('/cssFiles/guestBook.css', renderFile);
-app.get('/cssFiles/indexStyle.css', renderFile);
-app.get('/cssFiles/pageStyle.css', renderFile);
-app.get('images/favicon.ico', renderFile);
-app.get('/images/freshorigins.jpg', renderFile);
-app.get('/images/pbase-agerantum.jpg', renderFile);
-app.get('/images/pbase-Abeliophyllum.jpg', renderFile);
-app.get('/images/animated-flower-image-0021.gif', renderFile);
-app.get('/script.js', renderFile);
-app.get('/pdfFiles/ageratum.pdf', renderFile);
-app.get('/pdfFiles/Abeliophyllum.pdf', renderFile);
-
-// Export a function that can act as a handler
+app.get('/html/guestBook.html', renderGuestBook);
+app.post('/html/guestBook.html', readBodyAndUpdate);
+app.use(renderFile);
 
 module.exports = app.handle.bind(app);

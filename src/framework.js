@@ -11,20 +11,9 @@ class App {
 
   handle(req, res) {
     let matchingRoutes = this.routes.filter(this.isMatching.bind(null, req));
-    let remainingRoutes = [...matchingRoutes];
-    console.log(remainingRoutes);
-
-    const next = function() {
-      let current = remainingRoutes[0];
-      if (!current) {
-        // res.end();
-        return;
-      }
-
-      remainingRoutes = remainingRoutes.slice(1);
-      current.handler(req, res, next);
-    };
-    next();
+    let remainingRoute = matchingRoutes[0];
+    console.log(remainingRoute);
+    remainingRoute.handler(req, res);
   }
 
   post(url, handler) {
@@ -36,14 +25,6 @@ class App {
   }
   use(handler) {
     this.routes.push({handler});
-  }
-}
-class userComment {
-  constructor(date, time, author, comment) {
-    this.date = date;
-    this.time = time;
-    this.comment = comment;
-    this.author = author;
   }
 }
 
@@ -58,6 +39,5 @@ class Comments {
 
 module.exports = {
   App,
-  userComment,
   Comments
 };
