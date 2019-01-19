@@ -5,26 +5,32 @@
 }
 
 .infoSection {
-  margin-top: 50px
+  margin-top: 50px;
+  margin-bottom: 50px;
 }
 
 .commentsTable {
-  border:1px solid black;
-  font-size: 30px;
+  /* border:1px solid black; */
+  font-size: 20px;
 }
 
-.dateTime{
-  text-align: center;
-  border:1px solid black;
-  width: 150px;
+.date{
+  /* text-align: center; */
+  /* border:1px solid black; */
+  width: 250px;
 }
-.userName{
-  text-align: center;
-  border:1px solid black;
-  width: 200px;
+.time{
+  /* text-align: center; */
+  /* border:1px solid black; */
+  width: 250px;
+}
+.author{
+  /* text-align: center; */
+  /* border:1px solid black; */
+  width: 350px;
 }
 .comment{
-  text-align: center;
-  border:1px solid black;
-  width: 400px;
+  /* text-align: center; */
+  /* border:1px solid black; */
+  width:550px;
 }

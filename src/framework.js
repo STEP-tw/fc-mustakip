@@ -39,8 +39,9 @@ class App {
   }
 }
 class userComment {
-  constructor(dateTime, comment, author) {
-    this.dateTime = dateTime;
+  constructor(date, time, author, comment) {
+    this.date = date;
+    this.time = time;
     this.comment = comment;
     this.author = author;
   }
@@ -48,10 +49,10 @@ class userComment {
 
 class Comments {
   constructor() {
-    this.comments = [];
+    this.commentList = [];
   }
   addComment(comment) {
-    this.comments.unshift(comment);
+    this.commentList.push(comment);
   }
 }
 

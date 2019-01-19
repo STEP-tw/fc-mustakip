@@ -1,13 +1,30 @@
 const fs = require('fs');
 const {App, userComment, Comments} = require('./framework');
-let commentHtml = '';
 
+const convertToHtml = function(commentList) {
+  let htmlText = '</table>';
+  commentList.forEach(commentObject => {
+    let {date, time, author, comment} = commentObject;
+    console.log(commentObject);
+    let tablerow = `
+    <tr>
+    <td class = 'date'>${date}</td>
+    <td class = 'time'>${time}</td>
+    <td class = 'author'>${author}</td>
+    <td class = 'comment'>${comment}</td>
+    </tr>
+    `;
+    htmlText = tablerow + htmlText;
+  });
+  return htmlText;
+};
 const renderGuestBook = function(req, res) {
   let args = '';
   if (req.body) {
     args = extractArgs(req.body);
-    let {dateAndTime, name, comment} = args;
-    let newComment = new userComment(dateAndTime, name, comment);
+    let {date, time, author, comment} = args;
+
+    let newComment = new userComment(date, time, author, comment);
     comments.addComment(newComment);
   }
 
@@ -16,25 +33,30 @@ const renderGuestBook = function(req, res) {
     res.write(data);
     fs.readFile('./data.json', (err, data) => {
       data = JSON.parse(data);
-      let allComments = JSON.stringify(comments.comments.concat(data));
+      let allComments = data.concat(comments.commentList);
+      let commentHtml = convertToHtml(allComments);
 
-      res.write(allComments);
+      res.write(commentHtml);
       res.end();
-      // });
     });
   });
 };
 
-const getDateAndTime = function() {
-  return new Date().toLocaleString();
+const getTime = function() {
+  return new Date().toLocaleTimeString();
+};
+const getDate = function() {
+  return new Date().toLocaleDateString();
 };
 
 const extractArgs = function(userContent) {
   let args = {};
   let keyValuePairs = userContent.split('&');
+  console.log(keyValuePairs);
   keyValuePairs = keyValuePairs.map(pair => pair.split('='));
   keyValuePairs.forEach(pair => (args[pair[0]] = pair[1]));
-  args.dateAndTime = getDateAndTime();
+  args.time = getTime();
+  args.date = getDate();
   return args;
 };
 
