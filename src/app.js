@@ -12,11 +12,10 @@ const comments = getOldComments();
 const convertToHtml = function(commentList) {
   let htmlText = '</table>';
   commentList.forEach(commentObject => {
-    let {date, time, author, comment} = commentObject;
+    let {date, author, comment} = commentObject;
     let tablerow = `
     <tr>
     <td class = 'date'>${date}</td>
-    <td class = 'time'>${time}</td>
     <td class = 'author'>${author}</td>
     <td class = 'comment'>${comment}</td>
     </tr>
@@ -34,17 +33,14 @@ const renderGuestBook = function(req, res) {
   });
 };
 
-const getTime = function() {
-  return new Date().toLocaleTimeString();
-};
-
-const getDate = function() {
-  return new Date().toLocaleDateString();
+const removeNoise = function(userContent) {
+  return userContent.replace(/[+]/g, ' ');
 };
 
 const getAuthorAndComment = function(userContent) {
   let comment = {};
-  let args = userContent.split('&');
+  let cleanContent = removeNoise(userContent);
+  let args = cleanContent.split('&');
   let keyValuePairs = args.map(pair => pair.split('='));
   keyValuePairs.forEach(pair => (comment[pair[0]] = pair[1]));
   return comment;
@@ -52,12 +48,11 @@ const getAuthorAndComment = function(userContent) {
 
 const extractComment = function(userContent) {
   let comment = getAuthorAndComment(userContent);
-  comment.time = getTime();
-  comment.date = getDate();
+  comment.date = new Date().toLocaleDateString();
   return comment;
 };
 
-const getComment = function(req, res) {
+const saveComment = function(req, res) {
   let comment = extractComment(req.body);
   comments.push(comment);
   fs.writeFile(COMMENTS_FILE, JSON.stringify(comments), err => {
@@ -105,7 +100,8 @@ const sendNotFound = function(req, res) {
 let app = new App();
 app.use(readBody);
 app.get('/html/guestBook.html', renderGuestBook);
-app.post('/html/guestBook.html', getComment);
+app.post('/html/guestBook.html', saveComment);
 app.use(renderFile);
+app.use(sendNotFound);
 
 module.exports = app.handle.bind(app);

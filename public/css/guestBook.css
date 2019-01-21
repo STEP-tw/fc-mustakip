@@ -5,11 +5,13 @@
 }
 
 .infoSection {
-  margin-top: 50px;
-  margin-bottom: 50px;
+  padding-top: 50px;
+  padding-bottom: 50px;
+  border-bottom: 2px solid black;
 }
 
 .commentsTable {
+  margin-top: 10px;
   font-size: 20px;
 }
 
@@ -24,4 +26,14 @@
 }
 .comment{
   width:550px;
+}
+.commentHeading {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-size: 30px;
+}
+
+.refreshButton {
+  width:25px;
+  height:25px;
 }
