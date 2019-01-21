@@ -3,6 +3,7 @@
   <title>Guest Book</title>
   <head>
     <link rel="stylesheet" type="text/css" href="/css/guestBook.css" />
+    <script src="/script.js"></script>
     <h1 class="heading"><a href="/"><<</a> Guest Book</h1>
   </head>
   <body>
@@ -22,13 +23,8 @@
     </div>
     <div class = "commentHeading">
       <b>Comments</b> 
-      <button class = 'refreshButton'>&#x21bb</button>
+      <button class = 'refreshButton' onclick = "reloadComments()">&#x21bb</button>
     </div>
-    <table class = "commentsTable">
-      <tr>
-        <td class = "date">Date</td>
-        <td class = "author">Name</td>
-        <td class = "comment">Comment</td>
-      </tr>
+    <table  id = "table" class = "commentsTable">
   </body>
 </html>

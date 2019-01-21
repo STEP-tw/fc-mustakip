@@ -12,7 +12,6 @@ class App {
   handle(req, res) {
     let matchingRoutes = this.routes.filter(this.isMatching.bind(null, req));
     let remainingRoutes = [...matchingRoutes];
-    console.log(remainingRoutes);
 
     const next = function() {
       let currentRoute = remainingRoutes[0];

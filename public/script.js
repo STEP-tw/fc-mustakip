@@ -9,3 +9,12 @@ const blinkJar = function(document) {
     jar.style.visibility = 'visible';
   }, 1000);
 };
+
+const reloadComments = function() {
+  let table = document.getElementById('table');
+  fetch('/comments').then(function(response) {
+    response.text().then(function(text) {
+      table.innerHTML = text;
+    });
+  });
+};

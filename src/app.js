@@ -10,7 +10,13 @@ const getOldComments = function() {
 const comments = getOldComments();
 
 const convertToHtml = function(commentList) {
-  let htmlText = '</table>';
+  let htmlText = `
+  <tr>
+  <td class = 'date'>Date</td>
+  <td class = 'author'>Author</td>
+  <td class = 'comment'>Comment</td>
+  </tr>
+  `;
   commentList.forEach(commentObject => {
     let {date, author, comment} = commentObject;
     let tablerow = `
@@ -20,9 +26,9 @@ const convertToHtml = function(commentList) {
     <td class = 'comment'>${comment}</td>
     </tr>
     `;
-    htmlText = tablerow + htmlText;
+    htmlText = htmlText + tablerow;
   });
-  return htmlText;
+  return htmlText + '</table>';
 };
 
 const renderGuestBook = function(req, res) {
@@ -54,7 +60,7 @@ const extractComment = function(userContent) {
 
 const saveComment = function(req, res) {
   let comment = extractComment(req.body);
-  comments.push(comment);
+  comments.unshift(comment);
   fs.writeFile(COMMENTS_FILE, JSON.stringify(comments), err => {
     renderGuestBook(req, res);
   });
@@ -69,6 +75,11 @@ const readBody = function(req, res, next) {
     req.body = content;
     next();
   });
+};
+
+const renderComments = function(req, res) {
+  let commentsHtml = convertToHtml(comments);
+  send(res, commentsHtml);
 };
 
 const getPath = function(url) {
@@ -101,6 +112,7 @@ let app = new App();
 app.use(readBody);
 app.get('/html/guestBook.html', renderGuestBook);
 app.post('/html/guestBook.html', saveComment);
+app.get('/comments', renderComments);
 app.use(renderFile);
 app.use(sendNotFound);
 
