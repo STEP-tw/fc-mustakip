@@ -11,9 +11,16 @@ class App {
 
   handle(req, res) {
     let matchingRoutes = this.routes.filter(this.isMatching.bind(null, req));
-    let remainingRoute = matchingRoutes[0];
-    console.log(remainingRoute);
-    remainingRoute.handler(req, res);
+    let remainingRoutes = [...matchingRoutes];
+    console.log(remainingRoutes);
+
+    const next = function() {
+      let currentRoute = remainingRoutes[0];
+      if (!currentRoute) return;
+      remainingRoutes = remainingRoutes.slice(1);
+      currentRoute.handler(req, res, next);
+    };
+    next();
   }
 
   post(url, handler) {
@@ -28,16 +35,6 @@ class App {
   }
 }
 
-class Comments {
-  constructor() {
-    this.commentList = [];
-  }
-  addComment(comment) {
-    this.commentList.push(comment);
-  }
-}
-
 module.exports = {
-  App,
-  Comments
+  App
 };

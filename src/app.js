@@ -1,11 +1,18 @@
 const fs = require('fs');
-const {App, Comments} = require('./framework');
+const COMMENTS_FILE = './comments.json';
+const {App} = require('./framework');
+
+const getOldComments = function() {
+  let comments = fs.readFileSync(COMMENTS_FILE, 'utf8');
+  return JSON.parse(comments);
+};
+
+const comments = getOldComments();
 
 const convertToHtml = function(commentList) {
   let htmlText = '</table>';
   commentList.forEach(commentObject => {
     let {date, time, author, comment} = commentObject;
-    console.log(commentObject);
     let tablerow = `
     <tr>
     <td class = 'date'>${date}</td>
@@ -20,36 +27,21 @@ const convertToHtml = function(commentList) {
 };
 
 const renderGuestBook = function(req, res) {
-  if (req.body) {
-    let comment = extractComment(req.body);
-    comments.addComment(comment);
-  }
   let path = './public/html/guestBook.html';
   fs.readFile(path, (err, content) => {
-    res.write(content);
-    renderComments(req, res);
-  });
-};
-
-const renderComments = function(req, res) {
-  fs.readFile('./data.json', (err, jsonContent) => {
-    let parsedContent = JSON.parse(jsonContent);
-    let allComments = parsedContent.concat(comments.commentList);
-    fs.writeFile('./data.json', JSON.stringify(allComments), () => {
-      let commentHtml = convertToHtml(allComments);
-
-      res.write(commentHtml);
-      res.end();
-    });
+    let commentsHtml = convertToHtml(comments);
+    send(res, content + commentsHtml);
   });
 };
 
 const getTime = function() {
   return new Date().toLocaleTimeString();
 };
+
 const getDate = function() {
   return new Date().toLocaleDateString();
 };
+
 const getAuthorAndComment = function(userContent) {
   let comment = {};
   let args = userContent.split('&');
@@ -65,37 +57,55 @@ const extractComment = function(userContent) {
   return comment;
 };
 
-const readBodyAndUpdate = function(req, res) {
-  let content = '';
+const getComment = function(req, res) {
+  let comment = extractComment(req.body);
+  comments.push(comment);
+  fs.writeFile(COMMENTS_FILE, JSON.stringify(comments), err => {
+    renderGuestBook(req, res);
+  });
+};
 
+const readBody = function(req, res, next) {
+  let content = '';
   req.on('data', chunk => {
     content = content + chunk;
   });
   req.on('end', () => {
     req.body = content;
-    renderGuestBook(req, res);
+    next();
   });
+};
+
+const getPath = function(url) {
+  if (url == '/') return './public/html/index.html';
+  return `./public${url}`;
+};
+
+const send = function(res, content, statusCode = 200) {
+  res.statusCode = statusCode;
+  res.write(content);
+  res.end();
 };
 
 const renderFile = function(req, res) {
-  let path = `./public${req.url}`;
-
-  if (req.url == '/') {
-    path = './public/html/index.html';
-  }
-  console.log(path);
-
-  fs.readFile(path, (err, data) => {
-    res.write(data);
-    res.end();
+  let path = getPath(req.url);
+  fs.readFile(path, (err, fileContent) => {
+    if (err) {
+      sendNotFound(req, res);
+      return;
+    }
+    send(res, fileContent);
   });
 };
 
-let comments = new Comments();
+const sendNotFound = function(req, res) {
+  send(res, 'File not Found', 404);
+};
 
 let app = new App();
+app.use(readBody);
 app.get('/html/guestBook.html', renderGuestBook);
-app.post('/html/guestBook.html', readBodyAndUpdate);
+app.post('/html/guestBook.html', getComment);
 app.use(renderFile);
 
 module.exports = app.handle.bind(app);
