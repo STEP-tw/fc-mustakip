@@ -9,35 +9,13 @@ const getOldComments = function() {
 
 const comments = getOldComments();
 
-const convertToHtml = function(commentList) {
-  let htmlText = `
-  <tr>
-  <td class = 'date'>Date</td>
-  <td class = 'author'>Author</td>
-  <td class = 'comment'>Comment</td>
-  </tr>
-  `;
-  commentList.forEach(commentObject => {
-    let {date, author, comment} = commentObject;
-    let tablerow = `
-    <tr>
-    <td class = 'date'>${date}</td>
-    <td class = 'author'>${author}</td>
-    <td class = 'comment'>${comment}</td>
-    </tr>
-    `;
-    htmlText = htmlText + tablerow;
-  });
-  return htmlText + '</table>';
-};
-
-const renderGuestBook = function(req, res) {
-  let path = './public/html/guestBook.html';
-  fs.readFile(path, (err, content) => {
-    let commentsHtml = convertToHtml(comments);
-    send(res, content + commentsHtml);
-  });
-};
+// const renderGuestBook = function(req, res) {
+//   let path = './public/html/guestBook.html';
+//   fs.readFile(path, (err, content) => {
+//     let commentsHtml = convertToHtml(comments);
+//     send(res, content + commentsHtml);
+//   });
+// };
 
 const removeNoise = function(userContent) {
   return userContent.replace(/[+]/g, ' ');
@@ -54,16 +32,17 @@ const getAuthorAndComment = function(userContent) {
 
 const extractComment = function(userContent) {
   let comment = getAuthorAndComment(userContent);
-  comment.date = new Date().toLocaleDateString();
+  comment.date = new Date();
   return comment;
 };
 
-const saveComment = function(req, res) {
+const saveComment = function(req, res, next) {
   let comment = extractComment(req.body);
   comments.unshift(comment);
   fs.writeFile(COMMENTS_FILE, JSON.stringify(comments), err => {
-    renderGuestBook(req, res);
+    // renderGuestBook(req, res);
   });
+  next();
 };
 
 const readBody = function(req, res, next) {
@@ -78,8 +57,7 @@ const readBody = function(req, res, next) {
 };
 
 const renderComments = function(req, res) {
-  let commentsHtml = convertToHtml(comments);
-  send(res, commentsHtml);
+  send(res, JSON.stringify(comments));
 };
 
 const getPath = function(url) {
@@ -110,7 +88,7 @@ const sendNotFound = function(req, res) {
 
 let app = new App();
 app.use(readBody);
-app.get('/html/guestBook.html', renderGuestBook);
+// app.get('/html/guestBook.html', renderGuestBook);
 app.post('/html/guestBook.html', saveComment);
 app.get('/comments', renderComments);
 app.use(renderFile);
