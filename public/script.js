@@ -43,7 +43,7 @@ const updateComments = function(comments) {
 };
 
 const reloadComments = function() {
-  fetch('/comments').then(function(comments) {
+  fetch('/getComments').then(function(comments) {
     comments.json().then(updateComments);
   });
 };

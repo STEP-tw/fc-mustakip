@@ -1,6 +1,7 @@
 const fs = require('fs');
 const COMMENTS_FILE = './comments.json';
-const {App} = require('./framework');
+const {html} = require('./htmls.js');
+const {App} = require('./framework.js');
 
 const getOldComments = function() {
   let comments = fs.readFileSync(COMMENTS_FILE, 'utf8');
@@ -8,6 +9,8 @@ const getOldComments = function() {
 };
 
 const comments = getOldComments();
+
+let guestBook = fs.readFileSync('./public/html/guestBook.html', 'utf8');
 
 const removeNoise = function(userContent) {
   return userContent.replace(/[+]/g, ' ');
@@ -29,10 +32,12 @@ const extractComment = function(userContent) {
 };
 
 const saveComment = function(req, res, next) {
-  let comment = extractComment(req.body);
+  let user = 'author=' + req.cookies.value + '&' + req.body;
+  let comment = extractComment(user);
   comments.unshift(comment);
   fs.writeFile(COMMENTS_FILE, JSON.stringify(comments), err => {});
-  next();
+
+  redirectToGuestBook(res);
 };
 
 const readBody = function(req, res, next) {
@@ -44,6 +49,41 @@ const readBody = function(req, res, next) {
     req.body = content;
     next();
   });
+};
+
+const redirectToGuestBook = function(res) {
+  res.writeHead(302, {
+    Location: '/html/guestBook.html'
+  });
+  res.end();
+  return;
+};
+const renderGuestBook = function(req, res) {
+  if (req.cookies.name) {
+    send(
+      res,
+      guestBook
+        .replace('__LOGGINGIN__', html.loggedInPage)
+        .replace('__USERNAME__', req.cookies.value)
+    );
+    return;
+  }
+  send(res, guestBook.replace('__LOGGINGIN__', html.loginPage));
+};
+
+const renderLoggedInPage = function(req, res, next) {
+  let username = req.body.split('=')[1];
+  res.setHeader('Set-Cookie', `username=${username}`);
+
+  redirectToGuestBook(res);
+};
+
+const renderLoggedOutPage = function(req, res, next) {
+  res.setHeader(
+    'Set-Cookie',
+    'username=;expires=Thu, 01 Jan 1970 00:00:00 UTC'
+  );
+  redirectToGuestBook(res);
 };
 
 const renderComments = function(req, res) {
@@ -59,6 +99,20 @@ const send = function(res, content, statusCode = 200) {
   res.statusCode = statusCode;
   res.write(content);
   res.end();
+};
+
+const readCookie = function(req, res, next) {
+  let cookie = req.headers.cookie;
+  let cookies = {};
+  if (cookie) {
+    cookie.split(';').forEach(element => {
+      let cookieInfo = element.split('=');
+      cookies.name = cookieInfo[0];
+      cookies.value = cookieInfo[1];
+    });
+  }
+  req.cookies = cookies;
+  next();
 };
 
 const renderFile = function(req, res) {
@@ -77,9 +131,13 @@ const sendNotFound = function(req, res) {
 };
 
 let app = new App();
+app.use(readCookie);
 app.use(readBody);
-app.post('/html/guestBook.html', saveComment);
-app.get('/comments', renderComments);
+app.get('/html/guestBook.html', renderGuestBook);
+app.post('/login', renderLoggedInPage);
+app.post('/logout', renderLoggedOutPage);
+app.get('/getComments', renderComments);
+app.post('/sendComment', saveComment);
 app.use(renderFile);
 app.use(sendNotFound);
 
