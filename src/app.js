@@ -9,14 +9,6 @@ const getOldComments = function() {
 
 const comments = getOldComments();
 
-// const renderGuestBook = function(req, res) {
-//   let path = './public/html/guestBook.html';
-//   fs.readFile(path, (err, content) => {
-//     let commentsHtml = convertToHtml(comments);
-//     send(res, content + commentsHtml);
-//   });
-// };
-
 const removeNoise = function(userContent) {
   return userContent.replace(/[+]/g, ' ');
 };
@@ -39,9 +31,7 @@ const extractComment = function(userContent) {
 const saveComment = function(req, res, next) {
   let comment = extractComment(req.body);
   comments.unshift(comment);
-  fs.writeFile(COMMENTS_FILE, JSON.stringify(comments), err => {
-    // renderGuestBook(req, res);
-  });
+  fs.writeFile(COMMENTS_FILE, JSON.stringify(comments), err => {});
   next();
 };
 
@@ -88,7 +78,6 @@ const sendNotFound = function(req, res) {
 
 let app = new App();
 app.use(readBody);
-// app.get('/html/guestBook.html', renderGuestBook);
 app.post('/html/guestBook.html', saveComment);
 app.get('/comments', renderComments);
 app.use(renderFile);
